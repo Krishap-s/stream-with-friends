@@ -1,0 +1,20 @@
+{
+  "name": "stream_with_friends",
+  "version": "1.0.0",
+  "description": "Stream Torrents with Friends",
+  "scripts": {
+    "build": "webpack"
+  },
+  "main": "index.html",
+  "author": "Krishap S",
+  "license": "MIT",
+  "dependencies": {
+    "firebase": "^7.17.2",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "webtorrent": "^0.108.6"
+  },
+  "devDependencies": {
+    "lodash": "^4.17.19"
+  }
+}
