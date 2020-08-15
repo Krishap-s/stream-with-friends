@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "firebase": "^7.17.2",
+    "redux": "^4.0.5",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
     "webtorrent": "^0.108.6"
