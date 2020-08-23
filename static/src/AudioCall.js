@@ -49,20 +49,21 @@ class AudioCall {
     this.fchannel.onmessage = (e) => {
       const signal = JSON.parse(e);
       if (signal.sdp) {
-        if (signal.sdp.type === 'offer') {
-          this.pc.setRemoteDescription(new RTCSessionDescription(signal.sdp))
+        if (signal.type === 'offer') {
+          this.pc.setRemoteDescription(new RTCSessionDescription(signal))
             .then(() => {
               this.pc.createAnswer()
                 .then((desc) => {
+                  console.log(desc);
                   this.pc.setLocalDescription(desc);
-                  this.fchannel.send(JSON.stringify(desc));
+                  this.fchannel.send(JSON.stringify(desc.toJSON()));
                 });
             });
         } else if (signal.candinate) {
           /* eslint-disable no-undef */
           this.pc.addIceCandinate(new RTCIceCandinate(signal.candinate));
         } else {
-          this.pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
+          this.pc.setRemoteDescription(new RTCSessionDescription(signal));
         }
       }
     };
@@ -74,7 +75,7 @@ class AudioCall {
   call() {
     this.pc.createOffer().then((desc) => {
       this.pc.setLocalDescription(desc);
-      this.fchannel.send(desc);
+      this.fchannel.send(JSON.stringify(desc));
     });
   }
 }

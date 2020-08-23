@@ -5,19 +5,15 @@ import RoomManager from '../room_manager';
 import preRoom from '../templates/preRoom.handlebars';
 // import room from '../templates/room.handlebars';
 
-let uid;
 let Router;
-let displayName;
 let RoomsRef;
 let id;
 let root;
 let LocalStream;
+let User;
 
-window.Auth.onAuthStateChanged((User) => {
-  uid = User.uid;
-  if (User.displayName !== undefined) {
-    displayName = User.displayName;
-  }
+window.Auth.onAuthStateChanged((NewUser) => {
+  User = NewUser;
 });
 
 console.log(parseTorrent);
@@ -36,8 +32,10 @@ function createRoom() {
   const dropZone = document.getElementById('dropzone');
   let torrent;
   document.getElementById('enteroom').onclick = () => {
+    if (User.displayName !== undefined && torrent !== undefined) {
     // eslint-disable-next-line no-unused-vars
-    const Room = new RoomManager(uid, displayName, RoomsRef, LocalStream, torrent);
+      const Room = new RoomManager(User.uid, User.displayName, RoomsRef, LocalStream, torrent);
+    }
   };
   /* eslint-disable prefer-destructuring */
   // eslint-disable-next-line no-unused-vars
@@ -51,15 +49,22 @@ function createRoom() {
 
 function joinRoom() {
   document.getElementById('enteroom').onclick = () => {
+    if (User.displayName !== undefined) {
     // eslint-disable-next-line no-unused-vars
-    const Room = new RoomManager(uid, displayName, RoomsRef, LocalStream, null, id);
+      const Room = new RoomManager(User.uid, User.displayName, RoomsRef, LocalStream, null, id);
+    }
   };
 }
 
 function preRoomGen() {
-  if (displayName) {
-    document.getElementById('displayname').value = displayName;
+  const NameInput = document.getElementById('displayname');
+  if (User.displayName) {
+    NameInput.value = User.displayName;
   }
+  NameInput.onchange = () => {
+    User.updateProfile({ displayName: NameInput.value })
+      .then(() => { });
+  };
   if (id === null) {
     console.log('createroommode');
     createRoom();
