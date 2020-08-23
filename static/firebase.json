@@ -9,11 +9,28 @@
       "**/.*",
       "**/node_modules/**"
     ],
+    "redirects":[
+	{
+	"source":"/rooms/main.bundle.js",
+	"destination":"/main.bundle.js"
+	},
+	{
+	"source":"/rooms/preRoom.bundle.js",
+	"destination":"/preRoom.bundle.js"
+	}
+    ],
     "rewrites": [
       {
         "source": "**",
-        "destination": "/index.html"
-      }
+        "destination": "/index.html"},
+	{
+	"source":"/rooms{,/**}",
+	"destination":"/index.html"},
+	{
+	"source":"!/@(js|css)/**",
+	"destination": "/index.html"}
+  
+	
     ]
   }
 }

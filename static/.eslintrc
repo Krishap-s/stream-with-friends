@@ -1,0 +1,15 @@
+{
+	"parser": "babel-eslint",
+	"env":{
+		"browser":true
+	},
+	"extends":['airbnb'],
+	"rules":{
+	"no-console":"off",
+	"no-fallthrough":"off",
+	"no-restricted-syntax":"off",
+	"consistent-return":"off",
+	"no-param-reassign":"off"
+	}
+
+}
