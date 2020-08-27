@@ -1,7 +1,7 @@
 import * as firebase from 'firebase/app';
 import 'firebase/database';
 import 'firebase/auth';
-
+// Initialize firebase object.
 const firebaseConfig = {
   apiKey: '***REMOVED***',
   authDomain: '***REMOVED***',

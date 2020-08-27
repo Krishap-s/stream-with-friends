@@ -1,11 +1,16 @@
 import { createStore } from 'redux';
 import room from '../templates/room.handlebars';
-import Player from '../player';
-import player from '../reducers';
+import Player from '../assets/player';
+import playerReducer from '../assets/reducers';
 // eslint-disable-next-line no-unused-vars
-function roomView(root, Room, UID) {
-  window.playerStore = createStore(player);
-  // window.playerStore.dispatch({ type: 'SET_REMOTE' });
+
+/**
+ * Generates view for the room.
+ * @param {*} root
+ * @param {*} Room
+ */
+function roomView(root, Room ) {
+  window.playerStore = createStore(playerReducer);
   root.innerHTML = room();
   Room.ontorrentlearned = (torrent) => {
     console.log(torrent);

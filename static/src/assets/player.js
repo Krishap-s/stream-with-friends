@@ -2,7 +2,14 @@ import Webtorrent from 'webtorrent/webtorrent.min';
 import controls from './controls';
 
 /* eslint class-methods-use-this: ["error", { "exceptMethods": ["showControls","hideControls"] }] */
+
 class Player {
+  /**
+   * Creates Plyr player using provided video element,
+   * renders video to html5 video element and set subscribers to control the video element.
+   * @param {*} torrent
+   * @param {*} vidElem
+   */
   constructor(torrent, vidElem) {
     this.vidElem = vidElem;
     console.log(this.vidElem);
@@ -70,7 +77,9 @@ class Player {
     });
   }
 
-  // hides and shows player controls by using CSS display property
+  /**
+   * Hides play button and progress seeking from user
+   */
   hideControls() {
     document.querySelectorAll('.remote-only').forEach((el) => {
       el.style.display = 'none';
@@ -78,6 +87,9 @@ class Player {
     });
   }
 
+  /**
+   * Shows play button and progress seeking .
+   */
   showControls() {
     document.querySelectorAll('.remote-only').forEach((el) => {
       el.style.display = '';

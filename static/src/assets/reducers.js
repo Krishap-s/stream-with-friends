@@ -12,7 +12,7 @@ function playerStateReducer(state = playerInitialState.playerState, action) {
   return action;
 }
 
-function player(state = playerInitialState, action) {
+function playerReducer(state = playerInitialState, action) {
   switch (action.type) {
     case 'CHANGE_STATE':
       return { ...state, playerState: playerStateReducer(state.playerState, action.playerState) };
@@ -28,4 +28,4 @@ function player(state = playerInitialState, action) {
   }
 }
 
-export default player;
+export default playerReducer;

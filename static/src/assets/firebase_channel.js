@@ -1,4 +1,9 @@
 class FirebaseChannel {
+  /**
+   * Creates a firebase channel.
+   * @param {*} id
+   * @param {*} ref
+   */
   constructor(id, ref) {
     this.id = id;
     this.ref = ref;
@@ -15,6 +20,10 @@ class FirebaseChannel {
     });
   }
 
+  /**
+   * Send data when called
+   * @param {*} newData
+   */
   send(newData) {
     this.ref.push({ id: this.id, data: newData }).then(() => {
     }).catch((error) => {
