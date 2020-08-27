@@ -1,6 +1,6 @@
 import DragDrop from 'drag-drop/buffer';
 import path from 'path';
-import parseTorrent from 'parse-torrent';
+import WebTorrent from 'webtorrent/webtorrent.min';
 import RoomManager from '../assets/room_manager';
 import preRoom from '../templates/preRoom.handlebars';
 import roomView from './room';
@@ -21,34 +21,48 @@ function isTorrentFile(file) {
  * @param {*} LocalStream
  * @param {*} RoomsRef
  */
-function createRoom(root, User, LocalStream, RoomsRef) {
-  const dropZone = document.getElementById('dropzone');
-  const butt = document.getElementById('enteroom');
+function createRoom(root, User, LocalStream, RoomsRef, router) {
+  const client = new WebTorrent();
+  let validTorrent = null;
+  let butt = document.getElementById('enteroom');
+  const mp4Check = (torrentId) => {
+    client.add(torrentId, (torrent) => {
+      torrent.pause();
+      const file = torrent.files.find((f) => f.name.endsWith('.mp4'));
+      if (file) {
+        validTorrent = torrent.magnetURI;
+        butt.disabled = false;
+        document.getElementById('torrentname').innerHTML = `File to be played: ${file.name}`;
+      } else {
+        alert("Forgot to mention, the player only supports .mp4 files which your torrent doesnt have, soooo \n you can't use this torrent");
+      }
+      torrent.destroy();
+    });
+    document.getElementById('torrentname').innerHTML = 'Checking ...';
+  };
   butt.disabled = true;
-  let torrent = null;
   butt.onclick = () => {
     if (User.displayName !== null) {
-      const Room = new RoomManager(User.uid, User.displayName, RoomsRef, LocalStream, torrent);
+      const Room = new RoomManager(User.uid, User.displayName, RoomsRef, LocalStream, validTorrent);
+      router.pause();
+      router.navigate(`/rooms/${Room.id}`);
       roomView(root, Room);
+      butt = null;
+      client.destroy();
     }
+  };
+  document.getElementById('magneturi').onchange = () => {
+    const magnetURI = `${document.getElementById('magneturi').value.trim()}&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com`;
+    console.log(magnetURI);
+    mp4Check(magnetURI);
   };
   /* eslint-disable prefer-destructuring */
   // Sets the drag and drop zone.
-  // eslint-disable-next-line no-unused-vars
-  DragDrop(dropZone, (files) => {
+  DragDrop(document.getElementById('dropzone'), (files) => {
     if (isTorrentFile(files[0])) {
-      const parsed = parseTorrent(files[0]);
-      const FileInfo = parsed.files.find((file) => file.name.slice(-4) === '.mp4');
-      if (FileInfo) {
-        torrent = parseTorrent.toMagnetURI(parsed);
-        document.getElementById('torrentname').innerHTML = `File to be played: ${FileInfo.name}`;
-        butt.disabled = false;
-        console.log(torrent);
-      } else {
-        alert('Forgot to mention this player only can play mp4 and your torrent doesnt have one');
-      }
+      mp4Check(files[0]);
     } else {
-      alert('Are you illiterate ? The box clearly says "DRAG AND DROP TORRENT FILE" ');
+      alert('Please use a torrent file');
     }
   });
 }
@@ -106,7 +120,7 @@ function preRoomView(root, Router, RoomsRef, id = null) {
         console.log('Joinroom mode');
       });
     } else {
-      gum.then((stream) => { createRoom(root, User, stream, RoomsRef); })
+      gum.then((stream) => { createRoom(root, User, stream, RoomsRef, Router); })
         .catch((err) => { alert(err); });
       console.log('createroommode');
     }
