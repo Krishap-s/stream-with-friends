@@ -9,7 +9,7 @@ import playerReducer from '../assets/reducers';
  * @param {*} root
  * @param {*} Room
  */
-function roomView(root, Room ) {
+function roomView(root, Room) {
   window.playerStore = createStore(playerReducer);
   root.innerHTML = room();
   Room.ontorrentlearned = (torrent) => {
