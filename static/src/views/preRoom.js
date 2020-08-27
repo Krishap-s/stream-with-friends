@@ -66,7 +66,7 @@ function joinRoom(root, User, LocalStream, RoomsRef, id) {
     if (User.displayName !== undefined) {
       // eslint-disable-next-line no-unused-vars
       const Room = new RoomManager(User.uid, User.displayName, RoomsRef, LocalStream, null, id);
-      roomView(root, Room );
+      roomView(root, Room);
     }
   };
 }
