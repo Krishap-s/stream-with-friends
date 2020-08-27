@@ -2,6 +2,15 @@ import AudioCall from './AudioCall';
 import FirebaseChannel from './firebase_channel';
 
 class RoomManager {
+  /**
+   * Creates or joins a room using firebase database.
+   * @param {*} uid
+   * @param {*} name
+   * @param {*} rooms
+   * @param {*} stream
+   * @param {*} torrent
+   * @param {*} id
+   */
   constructor(uid, name, rooms, stream, torrent = null, id = null) {
     this.uid = uid;
     this.stream = stream;
@@ -48,7 +57,7 @@ class RoomManager {
         if (Object.keys(this.connList).length === 0) {
           this.roomRef.onDisconnect().remove();
         } else {
-        // If someone else is there in room set the person as the remote on disconnecting
+        // If someone else is there in room give the remote to the person on disconnecting
           this.roomRef.child('remoteiswith').onDisconnect().set(Object.keys(this.connList)[0]);
         }
         if (this.onremoteuserset) {
@@ -64,13 +73,16 @@ class RoomManager {
     // Delete user from connection list on disconnecting
     this.currentUser.onDisconnect().remove();
 
-    // eslint-disable-next-line no-unused-vars
-    this.roomRef.child('connList').on('child_added', (Snapshot, prevKey) => {
+    // The callback is run for every user in the server connList.
+    this.roomRef.child('connList').on('child_added', (Snapshot) => {
       if (Snapshot.key === this.uid) {
         return;
       }
       if (Object.keys(this.connList).length === 0) {
         this.roomRef.onDisconnect().cancel();
+        /* onDisconnect() had to be called again since cancel()
+        removes all the onDisconnect listeners in the room.
+        */
         this.currentUser.onDisconnect().remove();
       }
       this.connList[Snapshot.key] = Snapshot.val();
@@ -78,12 +90,14 @@ class RoomManager {
         this.roomRef.child('remoteiswith').onDisconnect().set(Object.keys(this.connList)[0]);
       }
       const ids = [Snapshot.key, this.uid];
+      // The ids are sorted and the first id in the array sends offer and second sends the answer.
       ids.sort();
       const channelref = this.roomRef.child(`channels/${ids[0]}/${ids[1]}`);
       const Call = new AudioCall(this.stream, new FirebaseChannel(this.uid, channelref));
       if (this.uid === ids[0]) {
         Call.call();
       }
+      /* Calls event listeners to return tracks and datachannels when connected */
       Call.onremotetrack = (e) => {
         if (this.onremotetrackadded) {
           this.onremotetrackadded(e);
@@ -102,7 +116,8 @@ class RoomManager {
         }
       };
     });
-
+    /* If someone leaves or disconnects delete the user from local connList
+    and run a callback function. */
     this.roomRef.child('connList').on('child_removed', (Snapshot) => {
       if (Snapshot.key === this.uid) {
         return;
@@ -116,6 +131,10 @@ class RoomManager {
     });
   }
 
+  /**
+   * Give the remote to someone else if you are the remote.
+   * @param {*} uid
+   */
   ChangeRemote(uid) {
     this.roomRef.child('remoteiswith').set(uid);
     if (this.onremoteuserset) {

@@ -1,15 +1,26 @@
 import DragDrop from 'drag-drop/buffer';
 import path from 'path';
 import parseTorrent from 'parse-torrent';
-import RoomManager from '../room_manager';
+import RoomManager from '../assets/room_manager';
 import preRoom from '../templates/preRoom.handlebars';
 import roomView from './room';
 
+/**
+ * Checks if file is torrent file.
+ * @param {*} file
+ */
 function isTorrentFile(file) {
   const extname = path.extname(file.name).toLowerCase();
   return extname === '.torrent';
 }
 
+/**
+ * Creates Room and calls the room view.
+ * @param {*} root
+ * @param {*} User
+ * @param {*} LocalStream
+ * @param {*} RoomsRef
+ */
 function createRoom(root, User, LocalStream, RoomsRef) {
   const dropZone = document.getElementById('dropzone');
   const butt = document.getElementById('enteroom');
@@ -18,12 +29,13 @@ function createRoom(root, User, LocalStream, RoomsRef) {
   butt.onclick = () => {
     if (User.displayName !== null) {
       const Room = new RoomManager(User.uid, User.displayName, RoomsRef, LocalStream, torrent);
-      roomView(root, Room, User.uid);
+      roomView(root, Room);
     }
   };
   /* eslint-disable prefer-destructuring */
+  // Sets the drag and drop zone.
   // eslint-disable-next-line no-unused-vars
-  DragDrop(dropZone, (files, pos, filelist, directories) => {
+  DragDrop(dropZone, (files) => {
     if (isTorrentFile(files[0])) {
       const parsed = parseTorrent(files[0]);
       const FileInfo = parsed.files.find((file) => file.name.slice(-4) === '.mp4');
@@ -41,12 +53,20 @@ function createRoom(root, User, LocalStream, RoomsRef) {
   });
 }
 
+/**
+ * Joins a room using given room id.
+ * @param {*} root
+ * @param {*} User
+ * @param {*} LocalStream
+ * @param {*} RoomsRef
+ * @param {*} id
+ */
 function joinRoom(root, User, LocalStream, RoomsRef, id) {
   document.getElementById('enteroom').onclick = () => {
     if (User.displayName !== undefined) {
       // eslint-disable-next-line no-unused-vars
       const Room = new RoomManager(User.uid, User.displayName, RoomsRef, LocalStream, null, id);
-      roomView(root, Room, User.uid);
+      roomView(root, Room );
     }
   };
 }

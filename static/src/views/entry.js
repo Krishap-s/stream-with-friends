@@ -1,6 +1,11 @@
 import entry from '../templates/entry.handlebars';
 
-function entryPage(router, root) {
+/**
+ * Generates the view when user first arrives at site.
+ * @param {*} router
+ * @param {*} root
+ */
+function entryView(router, root) {
 // eslint-disable-next-line no-param-reassign
   root.innerHTML = entry();
   document.getElementById('joinbutt').onclick = () => {
@@ -19,4 +24,4 @@ function entryPage(router, root) {
   };
 }
 
-export default entryPage;
+export default entryView;

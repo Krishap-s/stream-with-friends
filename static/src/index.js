@@ -1,5 +1,5 @@
 import Navigo from 'navigo';
-import { RoomsRef, Auth } from './database';
+import { RoomsRef, Auth } from './assets/database';
 
 const rootDiv = document.getElementById('root');
 
@@ -8,7 +8,10 @@ const useHash = true; // Defaults to: false
 const hash = '#!'; // Defaults to: '#'
 const router = new Navigo(root, useHash, hash);
 
+// Making Firebase auth object global.
 window.Auth = Auth;
+
+// TODO: Fix imports for better performance.
 router
   .on({
     '/': () => {
