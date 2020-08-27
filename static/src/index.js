@@ -12,18 +12,18 @@ window.Auth = Auth;
 router
   .on({
     '/': () => {
-      import(/* webpackChunkName "enter" */ './pages/entry.js').then((module) => {
+      import(/* webpackChunkName "enter" */ './views/entry.js').then((module) => {
         module.default(router, rootDiv);
       });
     },
     '/rooms/': () => {
-      import(/* webpackChunkName: "preRoom" */ './pages/preRoom.js').then((module) => {
+      import(/* webpackChunkName: "preRoom" */ './views/preRoom.js').then((module) => {
         module.default(rootDiv, router, RoomsRef);
       });
     },
 
     '/rooms/:id': (params) => {
-      import(/* webpackChunkName: "preRoom" */ './pages/preRoom.js').then((module) => {
+      import(/* webpackChunkName: "preRoom" */ './views/preRoom.js').then((module) => {
         module.default(rootDiv, router, RoomsRef, params.id);
       });
     },
