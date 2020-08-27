@@ -14,8 +14,7 @@ class Player {
     this.vidElem = vidElem;
     console.log(this.vidElem);
     // eslint-disable-next-line no-undef
-    this.Player = new Plyr(this.vidElem, { controls, ratio: '21:9', clicktoPlay: 'false' });
-    this.hideControls();
+    this.Player = new Plyr(this.vidElem, { controls, clickToPlay: false });
     // setting event listener to player store
     window.playerStore.subscribe(() => {
       const state = window.playerStore.getState();

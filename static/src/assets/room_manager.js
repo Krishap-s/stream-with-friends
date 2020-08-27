@@ -18,6 +18,7 @@ class RoomManager {
     this.name = name;
     this.torrent = torrent;
     this.connList = {};
+    this.remoteuser = null;
     this.onremoteuserset = null;
     this.ontorrentlearned = null;
     this.onremotetrackadded = null;
