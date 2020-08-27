@@ -9,49 +9,59 @@ class RoomManager {
     this.name = name;
     this.torrent = torrent;
     this.connList = {};
-    this.onremoteuserlearned = null;
-    this.remoteuser = null;
+    this.onremoteuserset = null;
     this.ontorrentlearned = null;
     this.onremotetrackadded = null;
     this.onremotecontrolchannel = null;
     this.onmessagechannel = null;
     this.ondataremoved = null;
+    // Creates room if no id is entered
     if (id === null) {
       this.roomRef = rooms.push();
       this.roomRef.set({
         torrent: this.torrent, remoteiswith: this.uid,
+      }).then(() => {
+        if (this.ontorrentlearned) {
+          this.ontorrentlearned(this.torrent);
+        }
+        if (this.onremoteuserset) {
+          this.onremoteuserset();
+        }
       });
+
       this.roomRef.onDisconnect().remove();
       this.id = this.roomRef.key;
     } else {
       this.roomRef = rooms.child(id);
+      this.roomRef.child('torrent').once('value', (Snapshot) => {
+        this.torrent = Snapshot.val();
+        if (this.ontorrentlearned) {
+          this.ontorrentlearned(this.torrent);
+        }
+      });
     }
-    console.log(this.connList);
 
+    console.log(this.connList);
     this.roomRef.child('remoteiswith').on('value', (Snapshot) => {
       if (Snapshot.val() === this.uid) {
+        // If there is no one else in the room delete the room on disconnecting
         if (Object.keys(this.connList).length === 0) {
           this.roomRef.onDisconnect().remove();
         } else {
+        // If someone else is there in room set the person as the remote on disconnecting
           this.roomRef.child('remoteiswith').onDisconnect().set(Object.keys(this.connList)[0]);
         }
-        if (this.onremoteuserlearned) {
-          this.onremoteuserlearned(Snapshot.val());
+        if (this.onremoteuserset) {
+          this.onremoteuserset();
         }
       }
 
       this.remoteuser = Snapshot.val();
     });
 
-    this.roomRef.child('torrent').once('value', (Snapshot) => {
-      this.torrent = Snapshot.val();
-      if (this.ontorrentlearned) {
-        this.ontorrentlearned(this.torrent);
-      }
-    });
-
     this.currentUser = this.roomRef.child('connList').child(this.uid);
     this.currentUser.set(this.name);
+    // Delete user from connection list on disconnecting
     this.currentUser.onDisconnect().remove();
 
     // eslint-disable-next-line no-unused-vars
@@ -108,6 +118,9 @@ class RoomManager {
 
   ChangeRemote(uid) {
     this.roomRef.child('remoteiswith').set(uid);
+    if (this.onremoteuserset) {
+      this.remoteuserset();
+    }
     this.roomReF.child('remoteiswith').onDisconnect().cancel();
   }
 }

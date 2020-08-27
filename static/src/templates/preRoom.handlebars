@@ -12,7 +12,7 @@
 
 			<div class="col mx-auto">
 				<div class="text-center">
-				<button id="enteroom" type="button" class="btn btn-outline-success btn-lg float-none mt-2 mb-3">{{#if isJoin}}Join{{else}}Create{{/if}}</button>
+				<button id="enteroom" disabled=true type="button" class="btn btn-outline-success btn-lg float-none mt-2 mb-3">{{#if isJoin}}Join{{else}}Create{{/if}}</button>
 				</div>
 			</div>
 
@@ -21,9 +21,10 @@
 		<div class="row">
 
 			<div class="col-8 mx-auto" >
-				<div id="dropzone" class="d-flex justify-content-center" style="height:50vh;border-style:dashed;border-color:grey;border-radius:20px">
+				<div id="dropzone" class="d-flex justify-content-center" style="height:40vh;border-style:dashed;border-color:grey;border-radius:20px">
 					<h1 class="display-4 text-muted align-self-center">Drag And Drop Torrent File</h1>
 				</div>
+				<h4 id="torrentname" class="text-success"></h4>
 			</div>
 		</div>
 		{{/unless}}
