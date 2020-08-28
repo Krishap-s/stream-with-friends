@@ -12,11 +12,13 @@
     "redirects":[
 	{
 	"source":"/rooms/main.bundle.js",
-	"destination":"/main.bundle.js"
+  "destination":"/main.bundle.js",
+  "type":"301"
 	},
 	{
 	"source":"/rooms/preRoom.bundle.js",
-	"destination":"/preRoom.bundle.js"
+  "destination":"/preRoom.bundle.js",
+  "type":"301"
 	}
     ],
     "rewrites": [
