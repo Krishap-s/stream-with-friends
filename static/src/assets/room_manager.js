@@ -101,7 +101,8 @@ class RoomManager {
       });
 
       Call.pc.on('connect', () => {
-        this.connList[Snapshot.key].peer = Call.pc;
+        this.connList[Snapshot.key].peer = Call;
+        Call.fchannel.onmessage = null;
       });
 
       Call.pc.on('stream', (remoteStream) => {
@@ -116,6 +117,8 @@ class RoomManager {
       if (Snapshot.key === this.uid) {
         return;
       }
+      this.connList[Snapshot.key].peer.pc.destroy();
+      this.connList[Snapshot.key].peer = null;
 
       delete this.connList[Snapshot.key];
       console.log(this.connList);

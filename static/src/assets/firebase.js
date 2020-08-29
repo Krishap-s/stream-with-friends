@@ -1,6 +1,8 @@
 import * as firebase from 'firebase/app';
 import 'firebase/database';
 import 'firebase/auth';
+import 'firebase/performance';
+
 // Initialize firebase object.
 const firebaseConfig = {
   apiKey: '***REMOVED***',
@@ -12,5 +14,7 @@ const firebaseConfig = {
 };
 
 const firebaseApp = firebase.initializeApp(firebaseConfig);
+// eslint-disable-next-line no-unused-vars
+const perf = firebase.performance();
 
 export default firebaseApp;

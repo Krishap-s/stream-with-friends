@@ -104,7 +104,10 @@ function setDisplayName(User) {
  */
 function preRoomView(root, Router, RoomsRef, id = null) {
   root.innerHTML = preRoom({ isJoin: id });
-  const gum = navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+  const gum = navigator.mediaDevices.getUserMedia({
+    audio:
+     { autoGainControl: false, echoCancellation: true, noiseSuppression: false },
+  });
   window.Auth.onAuthStateChanged((User) => {
     setDisplayName(User);
     document.getElementById('enteroom').disabled = false;

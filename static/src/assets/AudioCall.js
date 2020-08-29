@@ -7,10 +7,16 @@ import SimplePeer from 'simple-peer/simplepeer.min';
 class AudioCall {
   constructor(isCaller, LocalStream, fchannel) {
     const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+    this.fchannel = fchannel;
+    const sdpParser = (sdp) => {
+      sdp.replace('useinbandfec=1', 'useinbandfec=1; maxaveragebitrate=28000');
+      return sdp;
+    };
 
     this.pc = new SimplePeer({
       initiator: isCaller,
       config: configuration,
+      sdpTransform: sdpParser,
       trickle: true,
       stream: LocalStream,
     });
@@ -19,7 +25,7 @@ class AudioCall {
       fchannel.send(JSON.stringify(signal));
     });
 
-    fchannel.onmessage = (signalString) => {
+    this.fchannel.onmessage = (signalString) => {
       const signal = JSON.parse(signalString);
       this.pc.signal(signal);
     };
