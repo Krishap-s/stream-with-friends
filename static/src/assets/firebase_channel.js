@@ -8,15 +8,16 @@ class FirebaseChannel {
     this.id = id;
     this.ref = ref;
     this.onmessage = null;
-    this.ref.on('child_added', (data) => {
+    this.ref.on('child_added', (snapshot) => {
       // eslint-disable-next-line no-param-reassign
-      data = data.val();
+      const data = snapshot.val();
       if (data.id === this.id) {
         return;
       }
       if (this.onmessage) {
         this.onmessage(data.data);
       }
+      snapshot.ref.remove();
     });
   }
 
