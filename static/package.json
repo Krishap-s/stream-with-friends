@@ -25,6 +25,7 @@
     "lodash": "^4.17.20",
     "navigo": "^7.1.2",
     "redux": "^4.0.5",
+    "simple-peer": "^9.7.2",
     "webtorrent": "^0.108.6"
   },
   "devDependencies": {
