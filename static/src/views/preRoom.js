@@ -110,7 +110,6 @@ function preRoomView(root, Router, RoomsRef, id = null) {
     document.getElementById('enteroom').disabled = false;
     if (id) {
       RoomsRef.child(id).once('value', (Snapshot) => {
-        console.log(Snapshot);
         if (Snapshot.val() === null) {
           Router.navigate('/');
           alert('Room Not Found');

@@ -21,7 +21,7 @@ class RoomManager {
     this.remoteuser = null;
     this.onremoteuserset = null;
     this.ontorrentlearned = null;
-    this.onremotetrackadded = null;
+    this.onremotestreamadded = null;
     this.onremotecontrolchannel = null;
     this.onmessagechannel = null;
     this.ondataremoved = null;
@@ -51,7 +51,6 @@ class RoomManager {
       });
     }
 
-    console.log(this.connList);
     this.roomRef.child('remoteiswith').on('value', (Snapshot) => {
       if (Snapshot.val() === this.uid) {
         // If there is no one else in the room delete the room on disconnecting
@@ -86,7 +85,7 @@ class RoomManager {
         */
         this.currentUser.onDisconnect().remove();
       }
-      this.connList[Snapshot.key] = Snapshot.val();
+      this.connList[Snapshot.key] = { name: Snapshot.val() };
       if (this.uid === this.remoteuser) {
         this.roomRef.child('remoteiswith').onDisconnect().set(Object.keys(this.connList)[0]);
       }
@@ -94,28 +93,22 @@ class RoomManager {
       // The ids are sorted and the first id in the array sends offer and second sends the answer.
       ids.sort();
       const channelref = this.roomRef.child(`channels/${ids[0]}/${ids[1]}`);
-      const Call = new AudioCall(this.stream, new FirebaseChannel(this.uid, channelref));
-      if (this.uid === ids[0]) {
-        Call.call();
-      }
-      /* Calls event listeners to return tracks and datachannels when connected */
-      Call.onremotetrack = (e) => {
-        if (this.onremotetrackadded) {
-          this.onremotetrackadded(e);
-        }
-      };
+      const isCaller = this.uid === ids[0];
+      const Call = new AudioCall(isCaller, this.stream, new FirebaseChannel(this.uid, channelref));
 
-      Call.onremotecontrolchannel = (e) => {
-        console.log(e);
-        if (this.onremotecontrolchanneladded) {
-          this.onremotecontrolchanneladded(e);
+      Call.pc.on('error', (err) => {
+        console.log(err);
+      });
+
+      Call.pc.on('connect', () => {
+        this.connList[Snapshot.key].peer = Call.pc;
+      });
+
+      Call.pc.on('stream', (remoteStream) => {
+        if (this.onremotestreamadded) {
+          this.onremotestreamadded(remoteStream);
         }
-      };
-      Call.onmessagechannel = (e) => {
-        if (this.onmessagechanneladded) {
-          this.onmessagechanneladded(e);
-        }
-      };
+      });
     });
     /* If someone leaves or disconnects delete the user from local connList
     and run a callback function. */

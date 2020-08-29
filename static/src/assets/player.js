@@ -12,9 +12,9 @@ class Player {
    */
   constructor(torrent, vidElem) {
     this.vidElem = vidElem;
-    console.log(this.vidElem);
     // eslint-disable-next-line no-undef
     this.Player = new Plyr(this.vidElem, { controls, clickToPlay: false });
+    this.hideControls();
     // setting event listener to player store
     window.playerStore.subscribe(() => {
       const state = window.playerStore.getState();
@@ -65,7 +65,6 @@ class Player {
     // Sets torrent and render to player
     this.client = new Webtorrent();
     this.client.add(torrent, (e) => {
-      console.log(e);
       const source = e.files.find((f) => f.name.endsWith('.mp4'));
       source.renderTo(this.vidElem, { controls: false });
       console.log(this.Player);
