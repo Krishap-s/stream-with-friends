@@ -10,14 +10,14 @@ import playerReducer from '../assets/reducers';
  * @param {*} Room
  */
 function roomView(root, Room) {
-  window.playerStore = createStore(playerReducer);
+  const playerStore = createStore(playerReducer);
   root.innerHTML = room();
   Room.ontorrentlearned = (torrent) => {
     // eslint-disable-next-line no-unused-vars
-    const TorrentPlayer = new Player(torrent, document.getElementById('videlem'));
+    const TorrentPlayer = new Player(torrent, document.getElementById('videlem'), playerStore);
   };
   Room.onremoteuserset = () => {
-    window.playerStore.dispatch({ type: 'SET_REMOTE' });
+    playerStore.dispatch({ type: 'SET_REMOTE' });
   };
 
   Room.onremotestreamadded = (stream) => {
@@ -34,6 +34,18 @@ function roomView(root, Room) {
     };
     root.appendChild(aud);
     aud.play();
+  };
+
+  playerStore.subscribe(() => {
+    const state = playerStore.getState();
+    if (state.isremote) {
+      console.log('broadcast');
+      Room.control(state.playerState);
+    }
+  });
+
+  Room.oncontrolmessage = (playerState) => {
+    playerStore.dispatch({ type: 'CHANGE_STATE', playerState });
   };
 }
 

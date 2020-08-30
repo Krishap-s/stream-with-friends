@@ -19,11 +19,11 @@ class RoomManager {
     this.torrent = torrent;
     this.connList = {};
     this.remoteuser = null;
+    this.oncontrolmessage = null;
+    this.onmessage = null;
     this.onremoteuserset = null;
     this.ontorrentlearned = null;
     this.onremotestreamadded = null;
-    this.onremotecontrolchannel = null;
-    this.onmessagechannel = null;
     this.ondataremoved = null;
     // Creates room if no id is entered
     if (id === null) {
@@ -64,7 +64,6 @@ class RoomManager {
           this.onremoteuserset();
         }
       }
-
       this.remoteuser = Snapshot.val();
     });
 
@@ -103,6 +102,18 @@ class RoomManager {
       Call.pc.on('connect', () => {
         this.connList[Snapshot.key].peer = Call;
         Call.fchannel.onmessage = null;
+        Call.pc.on('data', (data) => {
+          data = JSON.parse(data);
+          console.log(data, this.remoteuser, Snapshot.key, Snapshot.key === this.remoteuser && data.type === 'control');
+          if (Snapshot.key === this.remoteuser && data.type === 'control') {
+            if (this.oncontrolmessage) {
+              console.log('calling console');
+              this.oncontrolmessage(data.data);
+            } else if (this.onmessage) {
+              this.onmessage({ name: Snapshot.val(), data: data.data });
+            }
+          }
+        });
       });
 
       Call.pc.on('stream', (remoteStream) => {
@@ -132,12 +143,35 @@ class RoomManager {
    * Give the remote to someone else if you are the remote.
    * @param {*} uid
    */
-  ChangeRemote(uid) {
+  changeRemote(uid) {
     this.roomRef.child('remoteiswith').set(uid);
     if (this.onremoteuserset) {
       this.remoteuserset();
     }
     this.roomReF.child('remoteiswith').onDisconnect().cancel();
+  }
+
+  /**
+   * Broadcast message to everyone else
+   * @param {string} Message
+   */
+  broadcast(message) {
+    const data = JSON.stringify({ type: 'message', data: message });
+    Object.values(this.connList).forEach((User) => {
+      console.log(User);
+      User.peer.pc.send(data);
+    });
+  }
+
+  /**
+   * Broadcast control message if you have the remote
+   */
+  control(state) {
+    const data = JSON.stringify({ type: 'control', data: state });
+    Object.values(this.connList).forEach((User) => {
+      console.log(User);
+      User.peer.pc.send(data);
+    });
   }
 }
 export default RoomManager;
