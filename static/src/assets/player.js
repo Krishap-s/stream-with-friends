@@ -10,14 +10,15 @@ class Player {
    * @param {*} torrent
    * @param {*} vidElem
    */
-  constructor(torrent, vidElem) {
+  constructor(torrent, vidElem, playerStore) {
     this.vidElem = vidElem;
+    this.playerStore = playerStore;
     // eslint-disable-next-line no-undef
     this.Player = new Plyr(this.vidElem, { controls, clickToPlay: false });
     this.hideControls();
     // setting event listener to player store
-    window.playerStore.subscribe(() => {
-      const state = window.playerStore.getState();
+    this.playerStore.subscribe(() => {
+      const state = this.playerStore.getState();
       console.log(state.isremote);
       switch (state.isremote) {
         case true:
@@ -31,10 +32,12 @@ class Player {
       if (!state.isremote) {
         switch (state.playerState.paused) {
           case true:
+            console.log('pausing');
             this.Player.pause();
             break;
 
           default:
+            console.log('playing');
             this.Player.play();
             break;
         }
@@ -44,23 +47,23 @@ class Player {
     });
 
     // setting event listeners from playerStore to player.
-    this.Player.onplay = () => {
-      if (window.playerStore.getState().isremote) {
-        window.playerStore.dispatch({ type: 'CHANGE_STATE', playerState: { paused: this.Player.paused, currtime: this.Player.currentTime } });
+    this.Player.on('play', () => {
+      if (this.playerStore.getState().isremote) {
+        this.playerStore.dispatch({ type: 'CHANGE_STATE', playerState: { paused: this.Player.paused, currtime: this.Player.currentTime } });
       }
-    };
+    });
 
-    this.Player.onpause = () => {
-      if (window.playerStore.getState().isremote) {
-        window.playerStore.dispatch({ type: 'CHANGE_STATE', playerState: { paused: this.Player.paused, currtime: this.Player.currentTime } });
+    this.Player.on('pause', () => {
+      if (this.playerStore.getState().isremote) {
+        this.playerStore.dispatch({ type: 'CHANGE_STATE', playerState: { paused: this.Player.paused, currtime: this.Player.currentTime } });
       }
-    };
+    });
 
-    this.Player.onseeked = () => {
-      if (window.playerStore.getState().isremote) {
-        window.playerStore.dispatch({ type: 'CHANGE_STATE', playerState: { paused: this.Player.paused, currtime: this.Player.currentTime } });
+    this.Player.on('seeked', () => {
+      if (this.playerStore.getState().isremote) {
+        this.playerStore.dispatch({ type: 'CHANGE_STATE', playerState: { paused: this.Player.paused, currtime: this.Player.currentTime } });
       }
-    };
+    });
 
     // Sets torrent and render to player
     this.client = new Webtorrent();
