@@ -24,7 +24,7 @@ function isTorrentFile(file) {
 function createRoom(root, User, LocalStream, RoomsRef, router) {
   const client = new WebTorrent();
   let validTorrent = null;
-  let butt = document.getElementById('enteroom');
+  let butt = document.getElementById('enteroombutt');
   const mp4Check = (torrentId) => {
     client.add(torrentId, (torrent) => {
       torrent.pause();
@@ -42,7 +42,7 @@ function createRoom(root, User, LocalStream, RoomsRef, router) {
   };
   butt.disabled = true;
   butt.onclick = () => {
-    if (document.getElementById('displayname').value) {
+    if (document.getElementById('displayname').value !== '') {
       const Room = new RoomManager(User.uid, document.getElementById('displayname').value, RoomsRef, LocalStream, validTorrent);
       router.pause();
       router.navigate(`/rooms/${Room.id}`);
@@ -76,7 +76,7 @@ function createRoom(root, User, LocalStream, RoomsRef, router) {
  * @param {*} id
  */
 function joinRoom(root, User, LocalStream, RoomsRef, id) {
-  document.getElementById('enteroom').onclick = () => {
+  document.getElementById('enteroombutt').onclick = () => {
     if (document.getElementById('displayname').value) {
       // eslint-disable-next-line no-unused-vars
       const Room = new RoomManager(User.uid, document.getElementById('displayname').value, RoomsRef, LocalStream, null, id);
@@ -87,16 +87,17 @@ function joinRoom(root, User, LocalStream, RoomsRef, id) {
 
 function setDisplayName(User) {
   if (User.displayName) {
+    document.getElementById('enteroombutt').disabled = false;
     document.getElementById('displayname').value = User.displayName;
   }
   document.getElementById('displayname').onchange = () => {
     User.updateProfile({ displayName: document.getElementById('displayname').value })
       .then(() => { });
 
-    if (document.getElementById('displayname').value) {
-      document.getElementById('enteroom').disabled = false;
+    if (document.getElementById('displayname').value !== '') {
+      document.getElementById('enteroombutt').disabled = false;
     } else {
-      document.getElementById('enteroom').disabled = true;
+      document.getElementById('enteroombutt').disabled = true;
     }
   };
 }

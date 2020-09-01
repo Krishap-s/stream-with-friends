@@ -17,7 +17,10 @@ class RoomManager {
     console.log(this.stream);
     this.name = name;
     this.torrent = torrent;
+    this.muted = false;
     this.connList = {};
+    this.onuseradded = null;
+    this.onuserconnected = null;
     this.remoteuser = null;
     this.oncontrolmessage = null;
     this.onmessage = null;
@@ -84,6 +87,9 @@ class RoomManager {
         */
         this.currentUser.onDisconnect().remove();
       }
+      if (this.onuseradded) {
+        this.onuseradded({ uid: Snapshot.key, displayname: Snapshot.val() });
+      }
       this.connList[Snapshot.key] = { name: Snapshot.val() };
       if (this.uid === this.remoteuser) {
         this.roomRef.child('remoteiswith').onDisconnect().set(Object.keys(this.connList)[0]);
@@ -100,14 +106,15 @@ class RoomManager {
       });
 
       Call.pc.on('connect', () => {
+        if (this.onuserconnected) {
+          this.onuserconnected(Call.pc);
+        }
         this.connList[Snapshot.key].peer = Call;
         Call.fchannel.onmessage = null;
         Call.pc.on('data', (data) => {
           data = JSON.parse(data);
-          console.log(data, this.remoteuser, Snapshot.key, Snapshot.key === this.remoteuser && data.type === 'control');
           if (Snapshot.key === this.remoteuser && data.type === 'control') {
             if (this.oncontrolmessage) {
-              console.log('calling console');
               this.oncontrolmessage(data.data);
             } else if (this.onmessage) {
               this.onmessage({ name: Snapshot.val(), data: data.data });
@@ -165,6 +172,7 @@ class RoomManager {
 
   /**
    * Broadcast control message if you have the remote
+   * @param {Object} state
    */
   control(state) {
     const data = JSON.stringify({ type: 'control', data: state });
@@ -172,6 +180,14 @@ class RoomManager {
       console.log(User);
       User.peer.pc.send(data);
     });
+  }
+
+  /**
+   * Mute tracks when called.
+   */
+  toggleMute() {
+    this.stream.getTracks().forEach((track) => { track.enabled = !track.enabled; });
+    this.muted = !this.muted;
   }
 }
 export default RoomManager;
