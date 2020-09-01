@@ -42,8 +42,8 @@ function createRoom(root, User, LocalStream, RoomsRef, router) {
   };
   butt.disabled = true;
   butt.onclick = () => {
-    if (User.displayName !== null) {
-      const Room = new RoomManager(User.uid, User.displayName, RoomsRef, LocalStream, validTorrent);
+    if (document.getElementById('displayname').value) {
+      const Room = new RoomManager(User.uid, document.getElementById('displayname').value, RoomsRef, LocalStream, validTorrent);
       router.pause();
       router.navigate(`/rooms/${Room.id}`);
       roomView(root, Room);
@@ -77,22 +77,27 @@ function createRoom(root, User, LocalStream, RoomsRef, router) {
  */
 function joinRoom(root, User, LocalStream, RoomsRef, id) {
   document.getElementById('enteroom').onclick = () => {
-    if (User.displayName !== undefined) {
+    if (document.getElementById('displayname').value) {
       // eslint-disable-next-line no-unused-vars
-      const Room = new RoomManager(User.uid, User.displayName, RoomsRef, LocalStream, null, id);
+      const Room = new RoomManager(User.uid, document.getElementById('displayname').value, RoomsRef, LocalStream, null, id);
       roomView(root, Room);
     }
   };
 }
 
 function setDisplayName(User) {
-  const NameInput = document.getElementById('displayname');
   if (User.displayName) {
-    NameInput.value = User.displayName;
+    document.getElementById('displayname').value = User.displayName;
   }
-  NameInput.onchange = () => {
-    User.updateProfile({ displayName: NameInput.value })
+  document.getElementById('displayname').onchange = () => {
+    User.updateProfile({ displayName: document.getElementById('displayname').value })
       .then(() => { });
+
+    if (document.getElementById('displayname').value) {
+      document.getElementById('enteroom').disabled = false;
+    } else {
+      document.getElementById('enteroom').disabled = true;
+    }
   };
 }
 /**
@@ -106,11 +111,12 @@ function preRoomView(root, Router, RoomsRef, id = null) {
   root.innerHTML = preRoom({ isJoin: id });
   const gum = navigator.mediaDevices.getUserMedia({
     audio:
-     { autoGainControl: false, echoCancellation: true, noiseSuppression: false },
+     {
+       autoGainControl: false, echoCancellation: true, noiseSuppression: true, volume: 0.5,
+     },
   });
   window.Auth.onAuthStateChanged((User) => {
     setDisplayName(User);
-    document.getElementById('enteroom').disabled = false;
     if (id) {
       RoomsRef.child(id).once('value', (Snapshot) => {
         if (Snapshot.val() === null) {

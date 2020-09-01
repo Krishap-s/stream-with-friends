@@ -14,7 +14,8 @@ class Player {
     this.vidElem = vidElem;
     this.playerStore = playerStore;
     // eslint-disable-next-line no-undef
-    this.Player = new Plyr(this.vidElem, { controls, clickToPlay: false });
+    this.Player = new Plyr(this.vidElem,
+      { controls, clickToPlay: false, keyboard: { global: false, focus: false } });
     this.hideControls();
     // setting event listener to player store
     this.playerStore.subscribe(() => {
