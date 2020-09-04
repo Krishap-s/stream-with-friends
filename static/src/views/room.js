@@ -12,16 +12,29 @@ import watcherListObject from '../templates/watcher.handlebars';
 function roomView(root, Room) {
   // Create redux store
   const playerStore = createStore(playerReducer);
+  let TorrentPlayer;
   // Render View
   root.innerHTML = room();
   // Set torrent for player
   Room.ontorrentlearned = (torrent) => {
     // eslint-disable-next-line no-unused-vars
-    const TorrentPlayer = new Player(torrent, document.getElementById('videlem'), playerStore);
+    TorrentPlayer = new Player(torrent, document.getElementById('videlem'), playerStore);
   };
   // Tells player if it is remote or not.
   Room.onremoteuserset = () => {
     playerStore.dispatch({ type: 'SET_REMOTE' });
+    document.querySelectorAll('.give-remote').forEach((button) => {
+      console.log(button);
+      if (button.style.display === 'none') {
+        button.style.display = '';
+        button.onclick = () => {
+          Room.changeRemote(button.parentElement.id);
+          button.onclick = null;
+        };
+      } else {
+        button.style.display = 'none';
+      }
+    });
   };
 
   // Add Stream audio to document.
@@ -42,10 +55,9 @@ function roomView(root, Room) {
   };
 
   // Sends any change in player to others if you are remote.
-  playerStore.subscribe(() => {
+  const unsubscribe = playerStore.subscribe(() => {
     const state = playerStore.getState();
     if (state.isremote) {
-      console.log('broadcast');
       Room.control(state.playerState);
     }
   });
@@ -57,10 +69,22 @@ function roomView(root, Room) {
 
   // Add watcher to visible watcher list
   Room.onuseradded = (watcher) => {
+    const { isremote } = playerStore.getState();
     const html = watcherListObject({ uid: watcher.uid, displayName: watcher.displayname });
-    const node = document.createElement('div');
-    node.innerHTML = html;
+    const node = document.createRange().createContextualFragment(html);
+    node.lastElementChild.lastElementChild.onclick = () => {
+      Room.changeRemote(watcher.uid);
+      node.lastElementChild.lastElementChild.onclick = null;
+    };
+    if (isremote) {
+      node.lastElementChild.lastElementChild.style = '';
+    }
     document.getElementById('watchers').appendChild(node);
+  };
+
+  // Delete watcher from list if he disconnects
+  Room.onuserremoved = (watcherUID) => {
+    document.getElementById('watchers').removeChild(document.getElementById(watcherUID));
   };
 
   // Toggle mute button.
@@ -72,6 +96,17 @@ function roomView(root, Room) {
       muteButt.innerHTML = 'UNMute';
     }
     Room.toggleMute();
+  };
+
+  // Disconnect button.
+  document.getElementById('disconnectbutt').onclick = () => {
+    Room.disconnect();
+    TorrentPlayer.destroy();
+    unsubscribe();
+    window.router.resume();
+    window.router.navigate('/');
+    document.getElementById('mutebutt').onclick = null;
+    document.getElementById('disconnectbutt').onclick = null;
   };
 }
 

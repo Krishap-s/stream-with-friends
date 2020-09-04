@@ -6,28 +6,29 @@ const rootDiv = document.getElementById('root');
 const root = window.location.origin;
 const useHash = true; // Defaults to: false
 const hash = '#!'; // Defaults to: '#'
-const router = new Navigo(root, useHash, hash);
+// Making router object global
+window.router = new Navigo(root, useHash, hash);
 
 // Making Firebase auth object global.
 window.Auth = Auth;
 
 // TODO: Fix imports for better performance.
-router
+window.router
   .on({
     '/': () => {
       import(/* webpackChunkName "enter" */ './views/entry.js').then((module) => {
-        module.default(router, rootDiv);
+        module.default(rootDiv);
       });
     },
     '/rooms/': () => {
       import(/* webpackChunkName: "preRoom" */ './views/preRoom.js').then((module) => {
-        module.default(rootDiv, router, RoomsRef);
+        module.default(rootDiv, RoomsRef);
       });
     },
 
     '/rooms/:id': (params) => {
       import(/* webpackChunkName: "preRoom" */ './views/preRoom.js').then((module) => {
-        module.default(rootDiv, router, RoomsRef, params.id);
+        module.default(rootDiv, RoomsRef, params.id);
       });
     },
   })

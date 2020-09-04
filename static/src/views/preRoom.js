@@ -21,8 +21,9 @@ function isTorrentFile(file) {
  * @param {*} LocalStream
  * @param {*} RoomsRef
  */
-function createRoom(root, User, LocalStream, RoomsRef, router) {
+function createRoom(root, User, LocalStream, RoomsRef) {
   const client = new WebTorrent();
+  let remove = null;
   let validTorrent = null;
   let butt = document.getElementById('enteroombutt');
   const mp4Check = (torrentId) => {
@@ -43,12 +44,14 @@ function createRoom(root, User, LocalStream, RoomsRef, router) {
   butt.disabled = true;
   butt.onclick = () => {
     if (document.getElementById('displayname').value !== '') {
+      remove();
       const Room = new RoomManager(User.uid, document.getElementById('displayname').value, RoomsRef, LocalStream, validTorrent);
-      router.pause();
-      router.navigate(`/rooms/${Room.id}`);
-      roomView(root, Room);
+      window.router.pause();
+      window.router.navigate(`/rooms/${Room.id}`);
+      butt.onclick = null;
       butt = null;
       client.destroy();
+      roomView(root, Room);
     }
   };
   document.getElementById('magneturi').onchange = () => {
@@ -58,7 +61,7 @@ function createRoom(root, User, LocalStream, RoomsRef, router) {
   };
   /* eslint-disable prefer-destructuring */
   // Sets the drag and drop zone.
-  DragDrop(document.getElementById('dropzone'), (files) => {
+  remove = DragDrop(document.getElementById('dropzone'), (files) => {
     if (isTorrentFile(files[0])) {
       mp4Check(files[0]);
     } else {
@@ -80,6 +83,7 @@ function joinRoom(root, User, LocalStream, RoomsRef, id) {
     if (document.getElementById('displayname').value) {
       // eslint-disable-next-line no-unused-vars
       const Room = new RoomManager(User.uid, document.getElementById('displayname').value, RoomsRef, LocalStream, null, id);
+      document.getElementById('enteroombutt').onclick = null;
       roomView(root, Room);
     }
   };
@@ -108,7 +112,7 @@ function setDisplayName(User) {
  * @param {*} RoomsRef
  * @param {*} id
  */
-function preRoomView(root, Router, RoomsRef, id = null) {
+function preRoomView(root, RoomsRef, id = null) {
   root.innerHTML = preRoom({ isJoin: id });
   const gum = navigator.mediaDevices.getUserMedia({
     audio:
@@ -121,7 +125,7 @@ function preRoomView(root, Router, RoomsRef, id = null) {
     if (id) {
       RoomsRef.child(id).once('value', (Snapshot) => {
         if (Snapshot.val() === null) {
-          Router.navigate('/');
+          window.router.navigate('/');
           alert('Room Not Found');
         }
         gum.then((stream) => { joinRoom(root, User, stream, RoomsRef, id); })
@@ -129,7 +133,7 @@ function preRoomView(root, Router, RoomsRef, id = null) {
         console.log('Joinroom mode');
       });
     } else {
-      gum.then((stream) => { createRoom(root, User, stream, RoomsRef, Router); })
+      gum.then((stream) => { createRoom(root, User, stream, RoomsRef); })
         .catch((err) => { alert(err); });
       console.log('createroommode');
     }

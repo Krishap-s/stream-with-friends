@@ -29,6 +29,11 @@ class AudioCall {
       const signal = JSON.parse(signalString);
       this.pc.signal(signal);
     };
+
+    this.pc.once('connect', () => {
+      fchannel.onmessage = null;
+      this.pc.removeAllListeners('signal');
+    });
   }
 }
 

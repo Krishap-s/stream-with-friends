@@ -3,6 +3,7 @@ import controls from './controls';
 
 /* eslint class-methods-use-this: ["error", { "exceptMethods": ["showControls","hideControls"] }] */
 
+// TODO: Get Current state of already playing player.
 class Player {
   /**
    * Creates Plyr player using provided video element,
@@ -12,13 +13,14 @@ class Player {
    */
   constructor(torrent, vidElem, playerStore) {
     this.vidElem = vidElem;
+    this.torrent = torrent;
     this.playerStore = playerStore;
     // eslint-disable-next-line no-undef
     this.Player = new Plyr(this.vidElem,
       { controls, clickToPlay: false, keyboard: { global: false, focus: false } });
     this.hideControls();
     // setting event listener to player store
-    this.playerStore.subscribe(() => {
+    this.unsubscribe = this.playerStore.subscribe(() => {
       const state = this.playerStore.getState();
       console.log(state.isremote);
       switch (state.isremote) {
@@ -97,6 +99,22 @@ class Player {
       el.style.display = '';
       console.log('Showing Controls');
     });
+  }
+
+  /**
+   * Destroys player instance.
+   */
+  destroy() {
+    this.client.remove(this.torrent);
+    this.client.destroy();
+    this.client = null;
+    URL.revokeObjectURL(this.Player.source);
+    this.Player.source = null;
+    this.Player.destroy();
+    this.Player = null;
+    this.unsubscribe();
+    this.vidElem = null;
+    this.playerStore = null;
   }
 }
 
