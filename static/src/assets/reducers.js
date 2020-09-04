@@ -2,6 +2,7 @@
 const playerInitialState = {
   isremote: false,
   torrent: null,
+  isready: false,
   playerState: {
     paused: true,
     currtime: 0,
@@ -22,6 +23,9 @@ function playerReducer(state = playerInitialState, action) {
 
     case 'TORRENT_LEARNED':
       return { ...state, torrent: action.torrent };
+
+    case 'READY':
+      return { ...state, isready: true };
 
     default:
       return state;
