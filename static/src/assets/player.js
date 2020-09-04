@@ -20,34 +20,6 @@ class Player {
       { controls, clickToPlay: false, keyboard: { global: false, focus: false } });
     this.hideControls();
     // setting event listener to player store
-    this.unsubscribe = this.playerStore.subscribe(() => {
-      const state = this.playerStore.getState();
-      console.log(state.isremote);
-      switch (state.isremote) {
-        case true:
-          this.showControls();
-          break;
-
-        default:
-          this.hideControls();
-          break;
-      }
-      if (!state.isremote) {
-        switch (state.playerState.paused) {
-          case true:
-            console.log('pausing');
-            this.Player.pause();
-            break;
-
-          default:
-            console.log('playing');
-            this.Player.play();
-            break;
-        }
-
-        this.Player.currentTime = state.playerState.currtime;
-      }
-    });
 
     // setting event listeners from playerStore to player.
     this.Player.on('play', () => {
@@ -67,14 +39,52 @@ class Player {
         this.playerStore.dispatch({ type: 'CHANGE_STATE', playerState: { paused: this.Player.paused, currtime: this.Player.currentTime } });
       }
     });
+    this.interval = setInterval(() => {
+      if (this.playerStore.getState().isremote) {
+        this.playerStore.dispatch({ type: 'CHANGE_STATE', playerState: { paused: this.Player.paused, currtime: this.Player.currentTime } });
+      }
+    }, 3000);
 
+    this.Player.on('loadedmetadata', () => {
+      console.log('ready');
+      this.unsubscribe = this.playerStore.subscribe(() => {
+        const state = this.playerStore.getState();
+        console.log(state.isremote);
+        switch (state.isremote) {
+          case true:
+            this.showControls();
+            break;
+
+          default:
+            this.hideControls();
+            break;
+        }
+        if (!state.isremote && state.isready) {
+          switch (state.playerState.paused) {
+            case true:
+              console.log('pausing');
+              this.Player.pause();
+              break;
+
+            default:
+              console.log('playing');
+              this.Player.play();
+              break;
+          }
+          const timediff = this.Player.currentTime - state.playerState.currtime;
+          if (timediff > 0.5 || timediff < -0.5) {
+            this.Player.currentTime = state.playerState.currtime;
+          }
+        }
+      });
+
+      this.playerStore.dispatch({ type: 'READY' });
+    });
     // Sets torrent and render to player
     this.client = new Webtorrent();
     this.client.add(torrent, (e) => {
       const source = e.files.find((f) => f.name.endsWith('.mp4'));
       source.renderTo(this.vidElem, { controls: false });
-      console.log(this.Player);
-
       this.client.on('error', (err) => {
         console.log(err);
       });
@@ -105,6 +115,7 @@ class Player {
    * Destroys player instance.
    */
   destroy() {
+    clearInterval(this.interval);
     this.client.remove(this.torrent);
     this.client.destroy();
     this.client = null;
