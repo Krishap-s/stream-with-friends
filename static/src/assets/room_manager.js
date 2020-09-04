@@ -1,6 +1,7 @@
 import AudioCall from './AudioCall';
 import FirebaseChannel from './firebase_channel';
 
+// TODO: Seperate torrent logic from room logic.
 class RoomManager {
   /**
    * Creates or joins a room using firebase database.
@@ -14,7 +15,6 @@ class RoomManager {
   constructor(uid, name, rooms, stream, torrent = null, id = null) {
     this.uid = uid;
     this.stream = stream;
-    console.log(this.stream);
     this.name = name;
     this.torrent = torrent;
     this.muted = false;
@@ -27,7 +27,7 @@ class RoomManager {
     this.onremoteuserset = null;
     this.ontorrentlearned = null;
     this.onremotestreamadded = null;
-    this.ondataremoved = null;
+    this.onuserremoved = null;
     // Creates room if no id is entered
     if (id === null) {
       this.roomRef = rooms.push();
@@ -56,12 +56,11 @@ class RoomManager {
 
     this.roomRef.child('remoteiswith').on('value', (Snapshot) => {
       if (Snapshot.val() === this.uid) {
-        // If there is no one else in the room delete the room on disconnecting
-        if (Object.keys(this.connList).length === 0) {
-          this.roomRef.onDisconnect().remove();
-        } else {
+        if (Object.keys(this.connList).length) {
         // If someone else is there in room give the remote to the person on disconnecting
           this.roomRef.child('remoteiswith').onDisconnect().set(Object.keys(this.connList)[0]);
+        } else {
+          this.roomRef.onDisconnect().remove();
         }
         if (this.onremoteuserset) {
           this.onremoteuserset();
@@ -105,12 +104,11 @@ class RoomManager {
         console.log(err);
       });
 
-      Call.pc.on('connect', () => {
+      Call.pc.once('connect', () => {
         if (this.onuserconnected) {
           this.onuserconnected(Call.pc);
         }
         this.connList[Snapshot.key].peer = Call;
-        Call.fchannel.onmessage = null;
         Call.pc.on('data', (data) => {
           data = JSON.parse(data);
           if (Snapshot.key === this.remoteuser && data.type === 'control') {
@@ -123,7 +121,7 @@ class RoomManager {
         });
       });
 
-      Call.pc.on('stream', (remoteStream) => {
+      Call.pc.once('stream', (remoteStream) => {
         if (this.onremotestreamadded) {
           this.onremotestreamadded(remoteStream);
         }
@@ -139,9 +137,8 @@ class RoomManager {
       this.connList[Snapshot.key].peer = null;
 
       delete this.connList[Snapshot.key];
-      console.log(this.connList);
-      if (this.ondataremoved) {
-        this.ondataremoved(Snapshot.key);
+      if (this.onuserremoved) {
+        this.onuserremoved(Snapshot.key);
       }
     });
   }
@@ -153,9 +150,9 @@ class RoomManager {
   changeRemote(uid) {
     this.roomRef.child('remoteiswith').set(uid);
     if (this.onremoteuserset) {
-      this.remoteuserset();
+      this.onremoteuserset();
     }
-    this.roomReF.child('remoteiswith').onDisconnect().cancel();
+    this.roomRef.child('remoteiswith').onDisconnect().cancel();
   }
 
   /**
@@ -188,6 +185,43 @@ class RoomManager {
   toggleMute() {
     this.stream.getTracks().forEach((track) => { track.enabled = !track.enabled; });
     this.muted = !this.muted;
+  }
+
+  /**
+   * Disconnect from room when called
+   * Disconnect from all peers and set all event handlers and properties to null
+   */
+  disconnect() {
+    Object.values(this.connList).forEach((User) => {
+      User.peer.pc.destroy();
+    });
+    this.roomRef.onDisconnect().cancel();
+    this.stream.getTracks().forEach((track) => track.stop());
+    this.currentUser.remove();
+    if (this.remoteuser === this.uid) {
+      if (Object.keys(this.connList).length) {
+        this.roomRef.child('remoteiswith').set(Object.keys(this.connList)[0]);
+      } else {
+        this.roomRef.remove();
+      }
+    }
+    this.roomRef.child('connList').off();
+    this.roomRef.child('remoteiswith').off();
+    this.uid = null;
+    this.stream = null;
+    this.name = null;
+    this.torrent = null;
+    this.muted = null;
+    this.connList = {};
+    this.onuseradded = null;
+    this.onuserconnected = null;
+    this.remoteuser = null;
+    this.oncontrolmessage = null;
+    this.onmessage = null;
+    this.onremoteuserset = null;
+    this.ontorrentlearned = null;
+    this.onremotestreamadded = null;
+    this.ondataremoved = null;
   }
 }
 export default RoomManager;

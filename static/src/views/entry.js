@@ -5,7 +5,7 @@ import entry from '../templates/entry.handlebars';
  * @param {*} router
  * @param {*} root
  */
-function entryView(router, root) {
+function entryView(root) {
 // eslint-disable-next-line no-param-reassign
   root.innerHTML = entry();
   document.getElementById('joinbutt').onclick = () => {
@@ -14,13 +14,13 @@ function entryView(router, root) {
       alert('Please Enter a valid roomid');
     } else {
       document.getElementById('joinbutt').onclick = null;
-      router.navigate(`/rooms/${roomId}`);
+      window.router.navigate(`/rooms/${roomId}`);
     }
   };
 
   document.getElementById('createbutt').onclick = () => {
     document.getElementById('createbutt').onclick = null;
-    router.navigate('/rooms/');
+    window.router.navigate('/rooms/');
   };
 }
 

@@ -31,6 +31,16 @@ class FirebaseChannel {
       console.error('Error writing new message to Firebase Database', error);
     });
   }
+
+  /**
+   * Destroy the channel
+   */
+  destroy() {
+    this.ref.off();
+    this.id = null;
+    this.ref = null;
+    this.onmessage = null;
+  }
 }
 
 export default FirebaseChannel;
