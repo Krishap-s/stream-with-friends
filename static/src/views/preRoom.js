@@ -43,16 +43,18 @@ function createRoom(root, User, LocalStream, RoomsRef) {
   };
   butt.disabled = true;
   butt.onclick = () => {
-    if (document.getElementById('displayname').value !== '') {
-      remove();
-      const Room = new RoomManager(User.uid, document.getElementById('displayname').value, RoomsRef, LocalStream, validTorrent);
-      window.router.pause();
-      window.router.navigate(`/rooms/${Room.id}`);
-      butt.onclick = null;
-      butt = null;
-      client.destroy();
-      roomView(root, Room);
+    if (document.getElementById('displayname').value === '') {
+      document.getElementById('displayname').classList.add('is-invalid');
+      return;
     }
+    remove();
+    const Room = new RoomManager(User.uid, document.getElementById('displayname').value, RoomsRef, LocalStream, validTorrent);
+    window.router.pause();
+    window.router.navigate(`/rooms/${Room.id}`);
+    butt.onclick = null;
+    butt = null;
+    client.destroy();
+    roomView(root, Room);
   };
   document.getElementById('magneturi').onchange = () => {
     const magnetURI = `${document.getElementById('magneturi').value.trim()}&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com`;
@@ -80,29 +82,22 @@ function createRoom(root, User, LocalStream, RoomsRef) {
  */
 function joinRoom(root, User, LocalStream, RoomsRef, id) {
   document.getElementById('enteroombutt').onclick = () => {
-    if (document.getElementById('displayname').value) {
-      // eslint-disable-next-line no-unused-vars
-      const Room = new RoomManager(User.uid, document.getElementById('displayname').value, RoomsRef, LocalStream, null, id);
-      document.getElementById('enteroombutt').onclick = null;
-      roomView(root, Room);
+    if (document.getElementById('displayname').value === '') {
+      document.getElementById('displayname').classList.add('is-invalid');
     }
+    const Room = new RoomManager(User.uid, document.getElementById('displayname').value, RoomsRef, LocalStream, null, id);
+    document.getElementById('enteroombutt').onclick = null;
+    roomView(root, Room);
   };
 }
 
 function setDisplayName(User) {
   if (User.displayName) {
-    document.getElementById('enteroombutt').disabled = false;
     document.getElementById('displayname').value = User.displayName;
   }
   document.getElementById('displayname').onchange = () => {
     User.updateProfile({ displayName: document.getElementById('displayname').value })
       .then(() => { });
-
-    if (document.getElementById('displayname').value !== '') {
-      document.getElementById('enteroombutt').disabled = false;
-    } else {
-      document.getElementById('enteroombutt').disabled = true;
-    }
   };
 }
 /**

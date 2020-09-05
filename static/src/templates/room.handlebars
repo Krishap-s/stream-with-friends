@@ -1,32 +1,49 @@
-	<div class="container-fluid" style="height:100vh;">
-		<div class="d-flex flex-column h-100 p-1" >
+<div class="container-fluid vh-100 ">
+	<div class="d-flex flex-column h-100 p-1">
 		<div class="row mb-1">
 			<div class="col-8">
-				<video id="videlem" controls ></video>
+				<video id="videlem" controls></video>
 			</div>
 
 			<div class="col-4">
 				<div class="card h-100">
 					<div class="card-header">
-						<h3 class="card-title"> Watchers : </h3> 
+						<h3 class="card-title"> Watchers : </h3>
 					</div>
-					<ul id="watchers" class="list-group list-group-flush">
-					</ul>
+					<div class="overflow-auto flex-grow-1" style="max-height: 30vh;">
+						<ul id="watchers" class="list-group list-group-flush">
+						</ul>
+					</div>
+				</div>
 			</div>
 		</div>
-		<div class="row flex-grow-1">
+		<div class="row flex-grow-1 ">
 			<div class="col-8">
-				<div class="card h-100" >
-					<div class="card-body">
-					<h3 class="card-title">Chat :</h3>
+				<div class="card h-100">
+					<div class="card-header">
+						<h3 class="card-title">Chat :</h3>
+					</div>
+					<div class="overflow-auto flex-grow-1" style="max-height: 33vh;">
+						<ul id="chat" class="list-group list-group-flush h-100"></ul>
+						</ul>
+					</div>
+					<div class="card-footer">
+						<div class="input-group">
+							<input id="message" type="text" class="form-control" autocomplete="off">
+							<div class="input-group-append">
+								<button id="send" class="btn btn-info">Send</button>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
 
 			<div class="col-4 align-self-center">
-				<button id="mutebutt" type="button" data-toggle="button" class="btn btn-outline-secondary btn-lg mx-auto"> Mute </button>
-				<button id="disconnectbutt" type="button" class="btn btn-outline-danger btn-lg mx-auto"> Disconnect </button>
+				<button id="mutebutt" type="button" data-toggle="button"
+					class="btn btn-outline-secondary btn-lg mx-auto"> Mute </button>
+				<button id="disconnectbutt" type="button" class="btn btn-outline-danger btn-lg mx-auto"> Disconnect
+				</button>
 			</div>
 		</div>
-		</div>
 	</div>
+</div>
