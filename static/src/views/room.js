@@ -1,7 +1,7 @@
 import { createStore } from 'redux';
 import room from '../templates/room.handlebars';
-import Player from '../assets/player';
-import playerReducer from '../assets/reducers';
+import Player from '../components/player';
+import playerReducer from '../components/reducers';
 import watcherListObject from '../templates/watcher.handlebars';
 import messageListObject from '../templates/message.handlebars';
 

@@ -1,5 +1,5 @@
 import Navigo from 'navigo';
-import { RoomsRef, Auth } from './assets/database';
+import { RoomsRef, Auth } from './components/database';
 
 const rootDiv = document.getElementById('root');
 

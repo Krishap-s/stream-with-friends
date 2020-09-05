@@ -1,7 +1,7 @@
 import DragDrop from 'drag-drop/buffer';
 import path from 'path';
 import WebTorrent from 'webtorrent/webtorrent.min';
-import RoomManager from '../assets/room_manager';
+import RoomManager from '../components/room_manager';
 import preRoom from '../templates/preRoom.handlebars';
 import roomView from './room';
 
