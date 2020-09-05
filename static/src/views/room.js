@@ -3,6 +3,7 @@ import room from '../templates/room.handlebars';
 import Player from '../assets/player';
 import playerReducer from '../assets/reducers';
 import watcherListObject from '../templates/watcher.handlebars';
+import messageListObject from '../templates/message.handlebars';
 
 /**
  * Generates view for the room.
@@ -107,6 +108,20 @@ function roomView(root, Room) {
     window.router.navigate('/');
     document.getElementById('mutebutt').onclick = null;
     document.getElementById('disconnectbutt').onclick = null;
+  };
+
+  // When a message is recieved
+  Room.onmessage = (message) => {
+    console.log(message.message);
+    const html = messageListObject({ displayName: message.displayName, message: message.message });
+    const node = document.createRange().createContextualFragment(html);
+    document.getElementById('chat').appendChild(node);
+  };
+
+  // When a message is sent
+  document.getElementById('send').onclick = () => {
+    console.log(document.getElementById('message').value);
+    Room.broadcast(document.getElementById('message').value);
   };
 }
 

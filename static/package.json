@@ -4,7 +4,7 @@
   "description": "Stream Torrents with Friends",
   "scripts": {
     "build": "webpack",
-    "serve": "webpack && firebase serve"
+    "run": "webpack && firebase serve"
   },
   "main": "index.html",
   "author": "Krishap S",

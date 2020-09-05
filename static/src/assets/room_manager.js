@@ -114,9 +114,9 @@ class RoomManager {
           if (Snapshot.key === this.remoteuser && data.type === 'control') {
             if (this.oncontrolmessage) {
               this.oncontrolmessage(data.data);
-            } else if (this.onmessage) {
-              this.onmessage({ name: Snapshot.val(), data: data.data });
             }
+          } else if (this.onmessage) {
+            this.onmessage({ displayName: Snapshot.val(), message: data.data });
           }
         });
       });
@@ -161,6 +161,9 @@ class RoomManager {
    */
   broadcast(message) {
     const data = JSON.stringify({ type: 'message', data: message });
+    if (this.onmessage) {
+      this.onmessage({ displayName: this.name, message });
+    }
     Object.values(this.connList).forEach((User) => {
       console.log(User);
       User.peer.pc.send(data);

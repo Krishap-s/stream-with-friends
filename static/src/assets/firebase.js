@@ -1,8 +1,3 @@
-import * as firebase from 'firebase/app';
-import 'firebase/database';
-import 'firebase/auth';
-import 'firebase/performance';
-
 // Initialize firebase object.
 const firebaseConfig = {
   apiKey: 'AIzaSyCSZOOi931rc-iEPGU-c_tqV5AVubJygIY',
@@ -13,8 +8,9 @@ const firebaseConfig = {
   measurementId: 'G-EE1BVBF4FW',
 };
 
+// eslint-disable-next-line no-undef
 const firebaseApp = firebase.initializeApp(firebaseConfig);
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line no-unused-vars, no-undef
 const perf = firebase.performance();
 
 export default firebaseApp;

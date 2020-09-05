@@ -4,7 +4,10 @@
 			
 			<div class="col-auto align-self-end mx-auto">
 				<label>Display Name:</label>
-				<input id="displayname" type="text" class="form-control ">
+				<input id="displayname" type="text" class="form-control">
+				<div class='invalid-feedback'>
+					Please Enter A display name
+				</div>
 			</div>
 
 		</div>
@@ -12,7 +15,7 @@
 
 			<div class="col mx-auto">
 				<div class="text-center">
-				<button id="enteroombutt" disabled=true type="button" class="btn btn-outline-success btn-lg float-none mt-2 mb-3">{{#if isJoin}}Join{{else}}Create{{/if}}</button>
+				<button id="enteroombutt" type="button" class="btn btn-outline-success btn-lg float-none mt-2 mb-3">{{#if isJoin}}Join{{else}}Create{{/if}}</button>
 				</div>
 			</div>
 
@@ -21,7 +24,7 @@
 		<div class="row">
 
 			<div class="col-8 d-flex text-center flex-column mx-auto ">
-				<label>Magnet URI:</label>
+				<label>Magnet URI Of Video To Play:</label>
 				<input id="magneturi" type="text" class="form-control mb-1" placeholder="magnet:?...">
 				<h4 class="text-muted">OR</h4>
 				<div id="dropzone" class="d-flex justify-content-center" style="height:40vh;border-style:dashed;border-color:grey;border-radius:20px">
