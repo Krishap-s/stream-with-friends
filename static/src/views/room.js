@@ -15,7 +15,7 @@ function roomView(root, Room) {
   const playerStore = createStore(playerReducer);
   let TorrentPlayer;
   // Render View
-  root.innerHTML = room();
+  root.innerHTML = room({ id: Room.id, url: window.location.href });
   // Set torrent for player
   Room.ontorrentlearned = (torrent) => {
     // eslint-disable-next-line no-unused-vars
@@ -108,8 +108,15 @@ function roomView(root, Room) {
     window.router.navigate('/');
     document.getElementById('mutebutt').onclick = null;
     document.getElementById('disconnectbutt').onclick = null;
+    document.getElementById('copybutt').onclick = null;
   };
 
+  // Copy url of page to clipboard.
+  document.getElementById('copybutt').onclick = () => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      alert('URL copied to clipboard');
+    });
+  };
   // When a message is recieved
   Room.onmessage = (message) => {
     console.log(message.message);
@@ -120,7 +127,6 @@ function roomView(root, Room) {
 
   // When a message is sent
   document.getElementById('send').onclick = () => {
-    console.log(document.getElementById('message').value);
     Room.broadcast(document.getElementById('message').value);
   };
 }
