@@ -29,7 +29,7 @@
 					</div>
 					<div class="card-footer">
 						<div class="input-group">
-							<input id="message" type="text" class="form-control" autocomplete="off">
+							<input id="message" type="text" class="form-control" placeholder="message" autocomplete="off">
 							<div class="input-group-append">
 								<button id="send" class="btn btn-info">Send</button>
 							</div>
@@ -39,6 +39,13 @@
 			</div>
 
 			<div class="col-4 align-self-center">
+				<h4 class="align-self-start">Room ID: {{id}}</h4>
+				<div class="input-group align-self-start mb-2">
+					<input id="url" type="text" class="form-control" value="{{url}}" disabled>
+					<div class="input-group-append">
+						<button class="btn btn-success" id="copybutt">Copy</button>
+					</div>
+				</div>
 				<button id="mutebutt" type="button" data-toggle="button"
 					class="btn btn-outline-secondary btn-lg mx-auto"> Mute </button>
 				<button id="disconnectbutt" type="button" class="btn btn-outline-danger btn-lg mx-auto"> Disconnect
