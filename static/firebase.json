@@ -19,7 +19,7 @@
 	"source":"/rooms/preRoom.bundle.js",
   "destination":"/preRoom.bundle.js",
   "type":"301"
-  }
+	}
     ],
     "rewrites": [
       {
