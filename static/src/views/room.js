@@ -128,6 +128,7 @@ function roomView(root, Room) {
   // When a message is sent
   document.getElementById('send').onclick = () => {
     Room.broadcast(document.getElementById('message').value);
+    document.getElementById('message').value = '';
   };
 }
 
